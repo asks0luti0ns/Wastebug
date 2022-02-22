@@ -359,6 +359,15 @@ EOT;
 	function view_list($listtype) {
 		global $db, $session, $config;
 
+                if($_GET['short']) {
+                        $short = $_GET['short'];
+                        if($short != "false") $session->shortlist = true;
+                        else $session->shortlist = false;
+                }
+
+                // is this a short form?
+                $short = $session->shortlist;
+
 		switch($listtype) {
 			case 'my':
 				$bugs = $db->users_bugs($session->userid,
@@ -399,18 +408,59 @@ EOT;
 		// autosubmits on change, have button for no-script browsers
 		// Notice that this violates XHTML 1.0 (strict and transitional)
 		// since <noscript> is only allowed in block context.
-		print '<noscript><input type="submit" value="Set" /></noscript>';
+                //
+                // Anyway, Links seems to NOT display stuff from <noscript> even
+                // if it does not support JavaScript. Having a <script> block
+                // also doesn't help so it does not follow the standard.
+                if(preg_match("/Links/", $_SERVER['HTTP_USER_AGENT']))
+                        print '<input type="submit" value="Set" />';
+                else print '<noscript>'
+                        . '<input type="submit" value="Set" /></noscript>';
 		print '</p></form>';
+                print "<p>Switch to <a href=\"{$config['path']}?"
+                        . "view=list&type=$listtype&project={$session->project}"
+                        . "&short=" . ($short ? "false" : "true")
+                        . '">'
+                        . ($short ? "long" : "short")
+                        . ' form</a>.</p>';
 
 		print "<h3>$pf</h3>";
 		if($bugs) {
-			print '<table class="buglist">';
+                        if(!$short) print '<table class="buglist">';
+                        else print <<<EOT
+<table class="buglistshort">
+<tr><th/>
+        <th>Name</th>
+        <th>Priority</th>
+        <th>Status</th>
+        <th>Assigned to</th>
+        <th>Project</th>
+        <th>Opened</th>
+</tr>
+EOT;
 			foreach ($bugs as $b) {
 				$class = preg_replace("/[^a-z]/", "",
 					strtolower($b->status));
 				$critical = (substr($b->priority,0,1) == '1')
 					? ' class="critical"' : '';
-				print <<<EOT
+                                if ($short) {
+                                        if(strlen($b->name) > 40)
+                                                $b->name =
+                                                        substr($b->name, 0, 38)
+                                                        . "...";
+                                        print <<<EOT
+<tr class="$class"><td><img class="smallicon" src="{$b->icon}"
+        alt="{$b->type}"/>
+</td><td><a href="{$config['path']}?view=bug&amp;bugid={$b->id}"
+        >#{$b->id}: {$b->name}</a></td>
+        <td$critical>{$b->priority}</td>
+        <td>{$b->status}</td>
+        <td>{$b->owner}</td>
+        <td>{$b->project}</td>
+        <td>{$b->opened}</td>
+</tr>
+EOT;
+                                } else print <<<EOT
 <tr><td><div class="bug"><h4 class="$class">
 <a href="{$config['path']}?view=bug&amp;bugid={$b->id}"
 	>#{$b->id}: {$b->name}</a></h4>

@@ -49,7 +49,7 @@ $config['width'] = 350;
  * MOSTLY INTERNAL STUFF BELOW
 */
 // DO NOT CHANGE: Release script fills in correct version automatically.
-$config['version'] = '0.9.0';
+$config['version'] = '0.9.1';
 
 $config['header'] = <<<EOT
 <?xml version="1.0" encoding="UTF-8"?>

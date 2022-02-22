@@ -296,6 +296,8 @@ EOT
                 }
 
                 function post_news($user, $title, $content) {
+                        $title = pg_escape_string($title);
+                        $content = pg_escape_string($content);
                         $result = pg_query($this->conn, <<<EOT
 INSERT INTO wastebug.wb_news (userid, title, content)
 VALUES ('$user', '$title', '$content');

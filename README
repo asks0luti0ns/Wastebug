@@ -36,7 +36,7 @@ INSTALLATION: (this looks longer than it really is)
      but if it doesn't, then see: http://www.php.net/manual/en/ref.mail.php
 
      Wastebug should work with safe-mode enabled, but this is not tested.
-     Wastebug does use any features that default safe-mode affects.
+     Wastebug does not use any features that default safe-mode affects.
      
      PostgreSQL 7.3 was used in development. Older versions won't work.
      Newer versions should work fine.
