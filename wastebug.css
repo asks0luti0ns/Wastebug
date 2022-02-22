@@ -1,0 +1,186 @@
+
+body {
+	background-color: #eee;
+	margin: 0px auto 0px 0px; /* handled later */
+	padding: 0px;
+	font-family: Verdana, sans-serif;
+	font-size: 10pt;
+}
+
+a {
+	color: #00d;
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a img {
+	border: 0px;
+}
+
+h1 {
+	margin: 10px;
+	padding: 0px;
+}
+
+h2 {
+	margin-left: 20px;
+	font-size: 16pt;
+	font-weight: normal;
+	font-style: normal;
+}
+
+h3 {
+	font-weight: normal;
+	font-style: normal;
+	margin-left: 25px;
+	margin-top: 15px;
+	margin-bottom: 0px;
+	font-size: 14pt;
+}
+
+h4 {
+	font-weight: normal;
+	font-style: normal;
+	margin-left: 35px;
+	font-size: 12pt;
+	margin-top: 15px;
+	margin-bottom: 0px;
+}
+
+p, table, ul, ol, dl {
+	margin-top: 5px;
+	margin-bottom: 0px;
+	margin-left: 50px;
+	margin-right: 40px;
+}
+
+table.admin {
+	empty-cells: show;
+	margin-bottom: 30px;
+}
+
+table.admin td {
+	padding-left: 10px;
+	padding-right: 10px;
+	margin: 2px;
+	background-color: #ddd;
+}
+
+table.layout {
+        margin: 0px;
+        padding: 0px;
+        border: none;
+}
+
+tr {
+	text-align: left;
+}
+
+pre {
+	margin-left: 60px;
+        min-width: 600px;
+	font-family: Andale Mono, monospace;
+	font-size: 9pt;
+        border: none;
+        border: 1px solid black;
+        padding: 4px;
+        background: #fff;
+}
+
+p.footer {
+	margin-left: 20px;
+	margin-bottom: 10px;
+}
+
+hr {
+	margin-top: 40px;
+	padding: 0px;
+}
+
+p.mainbar {
+	margin: 0px;
+	border-top: 1px;
+	border-bottom: 1px;
+	border-left: 0px;
+	border-right: 0px;
+	border-color: #88d;
+	border-style: solid;
+
+	padding-left: 5px;
+	background: #ddd;
+}
+
+p.mainbar a {
+	margin: 5px;
+}
+
+div.help p {
+	width: 550px;
+	margin-top: 10px;
+	text-align: justify;
+}
+
+.icon {
+	float: left;
+	margin-right: 5px;
+}
+
+.disabled {
+        color: #888;
+}
+
+.block {
+        border: 1px solid black;
+}
+
+/* styles for different statuses in bug listing */
+table.buglist td {
+	border: 1px solid #888;
+	background: #ddd;
+	padding: 10px;
+}
+
+.bug h4 {
+	margin-top: 0px;
+	margin-left: 0px;
+	padding: 1px;
+	border: 1px outset;
+}
+
+.bug p {
+	border: 1px inset;
+	padding: 1px;
+	background: #eee;
+}
+
+/* Mark critical as red */
+.critical {
+	color: #f00;
+}
+
+.new {
+	background: #fbb;
+}
+
+.open {
+	background: #feb;
+}
+
+.workinprocess {
+	background: #fff;
+}
+
+.fixed, .cantreproduce, .wontfix {
+	background: #bbb;
+}
+
+.cancelled, .invalid {
+	color: #400;
+	background: #bbb;
+	text-decoration: line-through;
+}
+
+
