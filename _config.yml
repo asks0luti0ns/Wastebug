@@ -22,7 +22,7 @@ title: Wastebug
 email: info@ask-solutions.org
 description: Simple web-based bug-tracking tool
 show_downloads: true
-baseurl: "" # the subpath of your site, e.g. /blog
+baseurl: /Wastebug # the subpath of your site, e.g. /blog
 url: "" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: asks0luti0ns
 github_username:  asks0luti0ns
