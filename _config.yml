@@ -23,7 +23,7 @@ email: info@ask-solutions.org
 description: Simple web-based bug-tracking tool
 show_downloads: true
 baseurl: /Wastebug # the subpath of your site, e.g. /blog
-url: "" # the base hostname & protocol for your site, e.g. http://example.com
+url: https://asks0luti0ns.github.io # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: asks0luti0ns
 github_username:  asks0luti0ns
 # Build settings
@@ -35,6 +35,7 @@ navigation:
   h_max: 3
 plugins:
   - jekyll-feed
+  - jekyll-sitemap
 
 # Exclude from processing.
 # The following items will not be processed, by default.
