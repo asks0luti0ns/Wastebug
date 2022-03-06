@@ -7,9 +7,11 @@
 @media screen and (min-width: 42em) and (max-width: 64em) { .page-header { position: relative; padding: 0.75rem 4rem; } }
 @media screen and (max-width: 42em) { .page-header { position: static; padding: 0.5rem 1rem; } }
 
-@media screen and (min-width: 64em) { .page-header .btn { position: absolute; top: 1rem; right: 1rem; } }
-@media screen and (min-width: 42em) and (max-width: 64em) { .page-header .btn { position: absolute; top: 1rem; right: 1rem; } }
-@media screen and (max-width: 42em) { .page-header .btn { position: static; top: auto; right: auto; } }
+@media screen and (min-width: 64em) { .page-header .buttons { position: absolute; top: 1rem; right: 1rem; } }
+@media screen and (min-width: 42em) and (max-width: 64em) { .page-header .buttons { position: absolute; top: 1rem; right: 1rem; } }
+@media screen and (max-width: 42em) { .page-header .buttons { position: static; top: auto; right: auto; } }
+
+.page-header .btn { display: block; }
 
 .page-header a.site-title { color: #fff; }
 
