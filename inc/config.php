@@ -7,10 +7,10 @@
 $config['connstr'] = 'dbname=bugs';
 
 // Administrator contact email address.
-$config['admin'] = 'tvoipio@cc.hut.fi';
+$config['admin'] = 'admim@example.com';
 
 // Server address, used for links when sending mail
-$config['server'] = 'wasteland.pp.htv.fi';
+$config['server'] = 'example.com';
 
 // Wastebug mail address, used when sending email notifications
 $config['email'] = "wastebug@{$config['server']}";
@@ -48,14 +48,11 @@ $config['width'] = 350;
 /*
  * MOSTLY INTERNAL STUFF BELOW
 */
-// DO NOT CHANGE: Release script fills in correct version automatically.
-$config['version'] = '0.9.1';
+$config['version'] = '0.9.2-devel';
 
 $config['header'] = <<<EOT
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html
-        PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
 		<title>{$config['title']}</title>
@@ -65,7 +62,6 @@ $config['header'] = <<<EOT
 		<h1><a href="{$config['path']}"
 		><img src="{$config['logo']}" alt="{$config['title']}" /></a>
 		</h1>
-
 EOT;
 
 $config['footer'] = <<<EOT
@@ -77,7 +73,6 @@ $config['footer'] = <<<EOT
 		</p>
 	</body>
 </html>
-
 EOT;
 
 ?>
