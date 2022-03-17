@@ -6,7 +6,7 @@
 		var $conn;
 		
 		
-		function DBConnection($connstr) {
+		function __construct($connstr) {
 			$this->conn = pg_connect($connstr);
 		}
 		
@@ -14,7 +14,7 @@
 		function fetch_object_array($result) {
 			$numrows = pg_num_rows($result);
 			$array = array();
-			for ($i = 0; $i < $numrows; $i++) {
+			for($i = 0; $i < $numrows; $i++) {
 				$array[$i] = pg_fetch_object($result, $i);
 			}
 			return $array;
@@ -30,7 +30,7 @@ SELECT id, super FROM wastebug.wb_users
 WHERE name = '$Pusername' AND password = '$password' AND enabled = true;
 EOT
 );
-			if (pg_num_rows($result) == 1) {
+			if(pg_num_rows($result) == 1) {
 				$row = pg_fetch_object($result, 0);
 				return $row;
 			} else return false;
@@ -213,7 +213,7 @@ SELECT name FROM wastebug.wb_projects WHERE id = '$id';
 EOT
 );
 			// We need the check anyway, let's but an 'egg' here =)
-			if (pg_num_rows($result) != 1) return "Retirement-Planning for Kids - AS/400 version";
+			if(pg_num_rows($result) != 1) return "Retirement-Planning for Kids - AS/400 version";
 			$obj = pg_fetch_object($result, 0);
 			return $obj->name;
 		}
@@ -251,7 +251,7 @@ EOT
 		
 		
 		function get_bugs($where, $project) {
-			if ($project) $where .= " AND projectid = '$project'";
+			if($project) $where .= " AND projectid = '$project'";
 			
 			$result = pg_query($this->conn, <<<EOT
 SELECT id, name, project, owner, type, icon, priority, status,
@@ -299,7 +299,7 @@ SELECT id, name, project, assigned, type, priority, version, computer, status,
 opened FROM wastebug.wb_bugs WHERE id = '$bug';
 EOT
 );
-			if (pg_num_rows($result) != 1) return false;
+			if(pg_num_rows($result) != 1) return false;
 			$bug = pg_fetch_object($result, 0);
 			return $bug;
 		}
@@ -323,7 +323,7 @@ EOT
 SELECT * FROM wastebug.wb_subscriptions WHERE bugid = '$bug' AND userid = '$user';
 EOT
 );
-			if (pg_num_rows($result) > 0) return true;
+			if(pg_num_rows($result) > 0) return true;
 			else return false;
 		}
 		
@@ -357,7 +357,7 @@ EOT
 		
 		
 		function get_news($limit) {
-			if ($limit) $limit = "LIMIT $limit";
+			if($limit) $limit = "LIMIT $limit";
 			
 			$result = pg_query($this->conn, <<<EOT
 SELECT
@@ -402,7 +402,7 @@ EOT
 SELECT id FROM wastebug.wb_projects WHERE owner = '$user';
 EOT
 );
-			if (pg_num_rows($result) != 0) return true;
+			if(pg_num_rows($result) != 0) return true;
 			else return false;
 		}
 		

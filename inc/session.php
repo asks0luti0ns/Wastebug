@@ -10,14 +10,13 @@
 	class Session {
 		var $view;
 		
-		
-		function Session() {
+		function __construct() {
 			$this->view = 'login';
 		}
 	}
 	
 	
-	if (!$_SESSION['session']) {
+	if(!isset($_SESSION['session'])) {
 		$_SESSION['session'] = new Session();
 	}
 	

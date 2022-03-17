@@ -90,7 +90,7 @@ EOT;
 	
 	
 	function view_admin() {
-		global $session, $db;
+		global $config, $session, $db;
 		if (!$session->super) return;
 		
 		$projects = $db->get_projects();
@@ -147,7 +147,7 @@ EOT;
 	
 	
 	function view_confirm() {
-		global $session, $db;
+		global $config, $session, $db;
 		if (!$session->super) return;
 		
 		$type = $_GET['type'];
@@ -175,7 +175,7 @@ EOT;
 	
 	
 	function view_addproject() {
-		global $session, $db;
+		global $config, $session, $db;
 		if (!$session->super) return;
 		
 		view_title("Create new project:");
@@ -201,7 +201,7 @@ EOT;
 	
 	// take stuff require for retry as arguments.
 	function view_adduser() {
-		global $session, $db, $adduser_retry;
+		global $config, $session;
 		if (!$session->super) return;
 		
 		view_title("Create new user:");
@@ -241,7 +241,7 @@ EOT;
 	
 	
 	function view_editproject() {
-		global $session, $db;
+		global $config, $session, $db;
 		if (!$session->super) return;
 		
 		view_title("Edit project:");
@@ -272,7 +272,7 @@ EOT;
 	
 	// take stuff require for retry as arguments.
 	function view_edituser() {
-		global $session, $db;
+		global $config, $session, $db;
 		if (!$session->super) return;
 		
 		view_title("Edit user:");
@@ -316,7 +316,7 @@ EOT;
 			.'<input type="submit" value="Save" /> '
 			.'<input type="reset" value="Reset" />'
 			."</td></tr>\n";
-		
+			
 		print "</table></form>\n";
 	}
 	
@@ -345,21 +345,19 @@ EOT;
 			.'<input type="submit" value="Save" /> '
 			."</td></tr>\n";
 		
-		print "</table></form>\n";
+		print "</table></form>\n";	
 	}
 	
 	
 	function view_list($listtype) {
 		global $db, $session, $config;
 		
-		if ($_GET['short']) {
-			$short = $_GET['short'];
-			if ($short != "false") $session->shortlist = true;
-			else $session->shortlist = false;
+		if (isset($_GET['short'])) {
+			$session->shortlist = $_GET['short'] === 'true' ? true : false;
 		}
 		
 		// is this a short form?
-		$short = $session->shortlist;
+		$short = isset($session->shortlist) ? $session->shortlist : false;
 		
 		switch ($listtype) {
 			case 'my':
@@ -390,6 +388,7 @@ EOT;
 			. $config['path'] . '"><p>Filter by project: ';
 		// Numbering in from $db->get_projects starts from 1
 		// Array indexing starts from 0 though
+		$projects[-1] = new \stdClass();
 		$projects[-1]->id = 0;
 		$projects[-1]->name = 'Any project';
 		$projects += $db->get_projects();
@@ -467,7 +466,7 @@ EOT;
 	
 	
 	function view_bug() {
-		global $session, $db, $config;
+		global $config, $session, $db;
 		
 		$bugid = (int) $_GET['bugid'];
 		$bug = $db->get_bug($bugid);
@@ -496,7 +495,7 @@ EOT;
 		
 ?></td></tr>
 	<tr><td>Project:</td>
-		<td><?php
+		<td><?php 
 		view_options("project", $db->get_projects(), $bug->project);
 		
 ?></td></tr>
@@ -550,7 +549,7 @@ EOT;
 	
 	
 	function view_create() {
-		global $db, $config, $session;
+		global $config, $session, $db;
 		
 		$projects = $db->get_projects();
 		
@@ -570,11 +569,12 @@ EOT;
 	<tr><td>Project:</td>
 		<td><?php 
 		// make project default to current filter if any
-		view_options("project", $db->get_projects(), $session->project);
+		view_options("project", $projects, $session->project);
 		?></td></tr>
 	<tr><td>Assigned to:</td>
 		<td><?php
 			// make assigned default to project owner
+			$users[-1] = new \stdClass();
 			$users[-1]->id = 0;
 			$users[-1]->name = 'Project Owner';
 			$users += $db->get_enabled_users();
@@ -633,7 +633,7 @@ EOT;
 	
 	
 	function view_default() {
-		global $session, $config;
+		global $config, $session;
 		print "<p>";
 		if ($session->super) {
 			print "You are an "
@@ -681,6 +681,7 @@ EOT;
 		// but we have to do it here so we get the links right.
 		if (isset($_GET['project']))
 			$session->project = (int) $_GET['project'];
+		if (!isset($session->project)) $session->project = '';
 		
 		if ($view != 'login') {
 			// logged in header..
@@ -711,67 +712,67 @@ EOT;
 			case 'login':
 				view_login();
 				break;
-			
+				
 			case 'list':
 				view_list($_GET['type']);
 				break;
-			
+				
 			case 'projects':
 				view_projects();
 				break;
-			
+				
 			case 'create':
 				view_create();
 				break;
-			
+				
 			case 'help':
 				include "inc/help.php";
 				break;
-			
+				
 			case 'bug':
 				view_bug();
 				break;
-			
+				
 			case 'admin':
 				view_admin();
 				break;
-			
+				
 			case 'confirm':
 				view_confirm();
 				break;
-			
+				
 			case 'adduser':
 				view_adduser();
 				break;
-			
+				
 			case 'addproject':
 				view_addproject();
 				break;
-			
+				
 			case 'edituser':
 				view_edituser();
 				break;
-			
+				
 			case 'editproject':
 				view_editproject();
 				break;
-			
+				
 			case 'password':
 				view_password();
 				break;
-			
+				
 			case 'postnews':
 				view_postnews();
 				break;
-			
+				
 			case 'allnews':
 				view_allnews();
 				break;
-			
+				
 			case 'default':
 				view_default();
 				break;
-			
+				
 			default:
 				print "<p>Bogus view: '$view'.</p>";
 		}

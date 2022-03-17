@@ -17,7 +17,7 @@
 	}
 	
 	
-	if ($_GET['action']) {
+	if (isset($_GET['action'])) {
 		require_once "inc/action.php";
 		handle_actions($_GET['action']);
 	}
@@ -29,8 +29,8 @@
 	
 	// This should be fixed to simply handle_view($_GET['view']);
 	// This is here until everything else is fixed for it.
-	if (!$session->userid) handle_view('login');
-	else if ($_GET['view']) handle_view($_GET['view']);
+	if (!isset($session->userid)) handle_view('login');
+	else if (isset($_GET['view'])) handle_view($_GET['view']);
 	else handle_view('default');
 	
 	print $config['footer'];

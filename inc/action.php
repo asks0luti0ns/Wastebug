@@ -27,6 +27,8 @@
 	// Notice: we want non-escaped stuff here.
 	//
 	function action_format_message($message) {
+		global $config;
+		
 		if (!$message) return false;
 		if (preg_match('/^\s*$/', $message)) return false;
 		$message = wordwrap($message, 80);
@@ -65,36 +67,41 @@
 		$bugname = $bugdata->name;
 		$userdata = $db->get_user($user);
 		$username = $userdata->fullname;
-		
+			
 		$date = date("Y-m-d H:i:s");
 		
 		$message = "Case $bug: $bugname\n"
-			. "http://{$config['server']}{$config['path']}?"
-			. "view=bug&bugid=$bug\n--\n"
-			. "$username $action on $date:\n\n$info\n\n";
+				. "http://{$config['server']}{$config['path']}?"
+				. "view=bug&bugid=$bug\n--\n"
+				. "$username $action on $date:\n\n$info\n\n";
 		
 		$tousers = $db->get_subscriptions($bug);
 		
 		foreach ($tousers as $u) {
+			if (!$u->email) continue;
 			mail($u->email,
 				"[Wastebug] Case $bug: $bugname",
 				$message,
-				"Reply-to: {$config['email']}\n"
-				. "Content-type: text/plain; charset=utf-8");
+				array(
+					'From'         => $config['email'],
+					'Content-type' => 'text/plain; charset=utf-8'
+				));
 		}
 	}
 	
 	
 	function action_login() {
 		global $session, $db;
-		$loginname = htmlspecialchars($_POST['username']);
-		$user = $db->login($loginname,md5($_POST['password']));
 		
-		if ($user) {
-			$session->userid = $user->id;
-			$session->super = $user->super == 't' ? true : false;
-			$session->username = $_POST['username'];
-		}
+		$loginname = isset($_POST['username']) ? htmlspecialchars($_POST['username']) : '';
+		$pass      = isset($_POST['password']) ? md5($_POST['password'])              : '';
+		
+		$user = $db->login($loginname, $pass);
+		
+		if (!$user) view_error("Invalid username or password.");
+		$session->userid   = $user->id;
+		$session->super    = $user->super == 't' ? true : false;
+		$session->username = $loginname;
 	}
 	
 	
@@ -103,12 +110,12 @@
 		
 		if (!$session->super) redirect();
 		
-		$loginname = htmlspecialchars($_POST['name']);
-		$pass1 = $_POST['pass1'];
-		$pass2 = $_POST['pass2'];
-		$fullname = htmlspecialchars($_POST['fullname']);
-		$email = htmlspecialchars($_POST['email']);
-		$super = $_POST['super'] ? true : false;
+		$loginname = isset($_POST['name'])     ? htmlspecialchars($_POST['name'])     : '';
+		$pass1     = isset($_POST['pass1'])    ? $_POST['pass1']                      : '';
+		$pass2     = isset($_POST['pass2'])    ? $_POST['pass1']                      : '';
+		$fullname  = isset($_POST['fullname']) ? htmlspecialchars($_POST['fullname']) : '';
+		$email     = isset($_POST['email'])    ? htmlspecialchars($_POST['email'])    : '';
+		$super     = isset($_POST['super'])    ? ($_POST['super'] ? true : false)     : false;
 		
 		if ($pass1 != $pass2) view_error("Passwords didn't match.");
 		if (!$pass1) view_error("Empty password.");
@@ -124,8 +131,8 @@
 		
 		if (!$session->super) redirect();
 		
-		$name = htmlspecialchars($_POST['name']);
-		$owner = (int) $_POST['owner'];
+		$name = isset($_POST['name']) ? htmlspecialchars($_POST['name']) : '';
+		$owner = isset($_POST['owner']) ? (int) $_POST['owner'] : NULL;
 		
 		if (!$name) view_error("Empty project name.");
 		
@@ -139,13 +146,13 @@
 		
 		if (!$session->super) redirect();
 		
-		$uid = (int) $_POST['uid'];
-		$loginname = htmlspecialchars($_POST['name']);
-		$pass1 = $_POST['pass1'];
-		$pass2 = $_POST['pass2'];
-		$fullname = htmlspecialchars($_POST['fullname']);
-		$email = htmlspecialchars($_POST['email']);
-		$super = $_POST['super'] ? true : false;
+		$uid       = isset($_POST['uid'])      ? ((int) $_POST['uid'])                : NULL;
+		$loginname = isset($_POST['name'])     ? htmlspecialchars($_POST['name'])     : '';
+		$pass1     = isset($_POST['pass1'])    ? $_POST['pass1']                      : '';
+		$pass2     = isset($_POST['pass2'])    ? $_POST['pass2']                      : '';
+		$fullname  = isset($_POST['fullname']) ? htmlspecialchars($_POST['fullname']) : '';
+		$email     = isset($_POST['email'])    ? htmlspecialchars($_POST['email'])    : '';
+		$super     = isset($_POST['super'])    ? ($_POST['super'] ? true : false)     : '';
 		
 		if ($pass1 != $pass2) view_error("Passwords didn't match.");
 		if (!$loginname) view_error("Empty username.");
@@ -161,9 +168,9 @@
 		
 		if (!$session->super) redirect();
 		
-		$pid = (int) $_POST['pid'];
-		$name = htmlspecialchars($_POST['name']);
-		$owner = (int) $_POST['owner'];
+		$pid   = isset($_POST['pid']) ? ((int) $_POST['pid'])            : NULL;
+		$name  = isset($_POST['pid']) ? htmlspecialchars($_POST['name']) : '';
+		$owner = isset($_POST['pid']) ? ((int) $_POST['owner'])          : NULL;
 		
 		if (!$name) view_error("Empty project name.");
 		$newuserdata = $db->get_user($owner);
@@ -180,9 +187,9 @@
 		
 		if (!$session->super) redirect();
 		
-		$user = (int) $_GET['uid'];
-		$db->set_user_enabled($user, true);
+		$user = isset($_GET['uid']) ? ((int) $_GET['uid']) : NULL;
 		
+		$db->set_user_enabled($user, true);
 		redirect("view=admin");
 	}
 	
@@ -192,20 +199,13 @@
 		
 		if (!$session->super) redirect();
 		
-		$user = (int) $_GET['uid'];
-		
+		$user = isset($_GET['uid']) ? ((int) $_GET['uid']) : NULL;
 		$userbugs = $db->users_bugs($user, 0);
-		if (count($userbugs) != 0)
-			view_error("Can't disable user with cases assigned.");
-		
-		if ($db->has_projects($user))
-			view_error("Can't disable user who owns projects.");
-		
-		if ($user == $session->userid)
-			view_error("You can't disable yourself.");
+		if (count($userbugs) != 0) view_error("Can't disable user with cases assigned.");
+		if ($db->has_projects($user)) view_error("Can't disable user who owns projects.");
+		if ($user == $session->userid) view_error("You can't disable yourself.");
 		
 		$db->set_user_enabled($user, false);
-		
 		redirect("view=admin");
 	}
 	
@@ -215,9 +215,9 @@
 		
 		if (!$session->super) redirect();
 		
-		$projectid = (int) $_GET['delid'];
-		$db->delete_project($projectid);
+		$projectid = isset($_GET['delid']) ? ((int) $_GET['delid']) : NULL;
 		
+		$db->delete_project($projectid);
 		redirect("view=admin");
 	}
 	
@@ -225,9 +225,9 @@
 	function action_password() {
 		global $session, $db;
 		
-		$pass1 = $_POST['pass1'];
-		$pass2 = $_POST['pass2'];
-		$opass = $_POST['opass'];
+		$pass1 = isset($_POST['pass1']) ? $_POST['pass1'] : '';
+		$pass2 = isset($_POST['pass2']) ? $_POST['pass2'] : '';
+		$opass = isset($_POST['opass']) ? $_POST['opass'] : '';
 		
 		if (!$db->login($session->username, md5($opass))) {
 			view_error("Invalid (old) password.");
@@ -245,13 +245,12 @@
 		
 		if (!$session->super) redirect();
 		
-		$title = htmlspecialchars($_POST['title']);
-		$content = $_POST['content'];
+		$title   = isset($_POST['title'])   ? htmlspecialchars($_POST['title']) : '';
+		$content = isset($_POST['content']) ? $_POST['content']                 : '';
 		
 		$content = action_format_message($content);
 		
 		$db->post_news($session->userid, $title, $content);
-		
 		redirect();
 	}
 	
@@ -260,28 +259,25 @@
 		global $session, $db;
 		
 		// this is safe, they are quoted for debe in $db->create_case
-		$name = htmlspecialchars($_POST['name']);
-		$project = (int) $_POST['project'];
-		$assigned = (int) $_POST['assigned'];
+		$name     = isset($_POST['name'])     ? htmlspecialchars($_POST['name']) : '';
+		$project  = isset($_POST['project'])  ? ((int) $_POST['project'])        : NULL;
+		$assigned = isset($_POST['assigned']) ? ((int) $_POST['assigned'])       : NULL;
 		
 		if (!$assigned) {
 			// get project owner as default.
 			$assigned = $db->get_project_owner($project);
 		}
 		
-		$type = (int) $_POST['category'];
-		$priority = (int) $_POST['priority'];
-		$version = htmlspecialchars($_POST['version']);
-		$computer = htmlspecialchars($_POST['computer']);
+		$type     = isset($_POST['category']) ? ((int) $_POST['category'])           : NULL;
+		$priority = isset($_POST['priority']) ? ((int) $_POST['priority'])           : NULL;
+		$version  = isset($_POST['version'])  ? htmlspecialchars($_POST['version'])  : '';
+		$computer = isset($_POST['computer']) ? htmlspecialchars($_POST['computer']) : '';
 		
 		$bug = $db->create_case($name, $project, $assigned, $type, $priority, $version, $computer);
 		
-		$message = action_format_message($_POST['description']);
-		
-		$changes = "";
-		
-		if ($_POST['subscribe']) $subscribe = true;
-		else $subscribe = false;
+		$message      = isset($_POST['description']) ? action_format_message($_POST['description']) : '';
+		$changes      = "";
+		$subscribe    = isset($_POST['subscribe'])   ? ($_POST['subscribe'] ? true : false)         : false;
 		
 		// Log the initial state.
 		$changes .= "Problem: '{$name}'<br />";
@@ -315,29 +311,27 @@
 	function action_edit() {
 		global $session, $db;
 		
-		$new->name = htmlspecialchars($_POST['name']);
-		$new->project = (int) $_POST['project'];
-		$new->assigned = (int) $_POST['assigned'];
-		$new->category = (int) $_POST['category'];
-		$new->priority = (int) $_POST['priority'];
-		$new->status = (int) $_POST['status'];
-		$new->version = htmlspecialchars($_POST['version']);
-		$new->computer = htmlspecialchars($_POST['computer']);
+		$new           = new \stdClass();
+		$new->name     = isset($_POST['name'])     ? htmlspecialchars($_POST['name'])              : '';
+		$new->project  = isset($_POST['project'])  ? ((int) $_POST['project'])                     : NULL;
+		$new->assigned = isset($_POST['assigned']) ? ((int) $_POST['assigned'])                    : NULL;
+		$new->category = isset($_POST['category']) ? ((int) $_POST['category'])                    : NULL;
+		$new->priority = isset($_POST['priority']) ? ((int) $_POST['priority'])                    : NULL;
+		$new->status   = isset($_POST['status'])   ? ((int) $_POST['status'])                      : NULL;
+		$new->version  = isset($_POST['version'])  ? htmlspecialchars($_POST['version'])           : '';
+		$new->computer = isset($_POST['computer']) ? htmlspecialchars($_POST['computer'])          : '';
+		$message       = isset($_POST['message'])  ? action_format_message($_POST['message'])      : '';
+		$message_mail  = isset($_POST['message'])  ? action_format_message_mail($_POST['message']) : '';
+		$bugid         = isset($_GET['bugid'])     ? ((int) $_GET['bugid'])                        : NULL;
 		
-		$message = action_format_message($_POST['message']);
-		$message_mail = action_format_message_mail($_POST['message']);
-		
-		$bug = $db->get_bug((int) $_GET['bugid']);
+		$bug = $db->get_bug($bugid);
 		if (!$bug) view_error("Non-existent case.");
 		$newuserdata = $db->get_user($new->assigned);
-		if ($newuserdata->enabled == "f")
-			view_error("Can't assign to a disabled user.");
+		if ($newuserdata->enabled == "f") view_error("Can't assign to a disabled user.");
 		
-		$changes = "";
+		$changes      = "";
 		$changes_mail = "";
-		
-		if ($_POST['subscribe']) $subscribe = true;
-		else $subscribe = false;
+		$subscribe    = isset($_POST['subscribe'])   ? ($_POST['subscribe'] ? true : false)         : false;
 		
 		$subscription = $db->get_subscription($bug->id, $session->userid);
 		
@@ -387,7 +381,6 @@
 			$changes .= "Changed computer to '{$new->computer}'<br />";
 			$changes_mail .= "Changed computer to '{$new->computer}'\n";
 		}
-		
 		if ($subscribe && !$subscription) {
 			$db->subscribe($bug->id, $session->userid);
 		} else if (!$subscribe && $subscription) {
@@ -418,7 +411,7 @@
 		
 		// This check is still here to protect actions, as we only
 		// check for the actual page view in 'index.php'
-		if ($session->userid || $action == 'login') {
+		if(isset($session->userid) || $action == 'login') {
 			switch ($action) {
 				case 'login':
 					action_login();
