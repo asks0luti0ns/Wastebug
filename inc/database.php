@@ -236,13 +236,8 @@ EOT
 			
 			$result = pg_query($this->conn, <<<EOT
 INSERT INTO wastebug.wb_bugs(name, project, assigned, type, priority, version, computer)
-VALUES ('$Bname', '$Bproject', '$Bassigned', '$Btype', '$Bpriority', '$Bversion', '$Bcomputer');
-EOT
-);
-			// Need to return the new bug id..
-			$oid = pg_last_oid($result);
-			$result = pg_query($this->conn, <<<EOT
-SELECT id FROM wastebug.wb_bugs WHERE oid = '$oid';
+VALUES ('$Bname', '$Bproject', '$Bassigned', '$Btype', '$Bpriority', '$Bversion', '$Bcomputer')
+RETURNING id;
 EOT
 );
 			$object = pg_fetch_object($result, 0);
